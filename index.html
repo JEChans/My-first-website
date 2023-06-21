@@ -9,7 +9,7 @@
   <meta name="google" content="notranslate" />
   <meta content="Mashup templates have been developped by Orson.io team" name="author">
 
-  <!-- Disable tap highlight on IE -->
+
   <meta name="msapplication-tap-highlight" content="no">
   
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-icon-180x180.png">
@@ -21,7 +21,7 @@
 
 <body>
 
- <!-- Add your content of header -->
+ 
 
 <header>
   <nav class="navbar navbar-fixed-top navbar-default">
@@ -46,18 +46,18 @@
            
           <p><small>© Untitled | Website created with <a href="http://www.mashup-template.com/" title="Create website with free html template">Jung Eui Chan</a>/<a href="https://www.unsplash.com/" title="Beautiful Free Images">Webprogramming</a></small></p>
           <p class="footer-share-icons">
-              <a href="https://www.twitter.com" class="fa-icon" title="">
-                  <i class="fa fa-twitter" aria-hidden="true"></i>
-              </a>
-              <a href="https://www.linkedin.com" class="fa-icon" title="">
-                  <i class="fa fa-instagram" aria-hidden="true"></i>
-              </a>
-              <a href="https://www.behance.com" class="fa-icon" title="">
-                  <i class="fa fa-behance" aria-hidden="true"></i>
-              </a>
-              <a href="https://www.vimeo.com" class="fa-icon" title="">
-                  <i class="fa fa-vimeo" aria-hidden="true"></i>
-              </a>
+            <a href="https://www.twitter.com" class="fa-icon" title="">
+              <i class="fa fa-twitter" aria-hidden="true"></i>
+          </a>
+          <a href="https://www.instagram.com" class="fa-icon" title="">
+              <i class="fa fa-instagram" aria-hidden="true"></i>
+          </a>
+          <a href="https://www.facebook.com" class="fa-icon" title="">
+            <i class="fa fa-facebook" aria-hidden="true"></i>
+        </a>
+          <a href="https://www.youtube.com" class="fa-icon" title="">
+            <i class="fa fa-youtube" aria-hidden="true"></i>
+        </a>
           </p>
                        
         </div>
@@ -78,7 +78,7 @@
         <div class="hero-full-wrapper">
           <div class="text-content">
             <h1>세계를 휘어잡은 축구</h1>
-            <p>"공은 둥글고, 경기는 90분이나 진행된다"</p><p>
+            <p style = "font-style:italic">"공은 둥글고, 경기는 90분이나 진행된다"</p><p style = "font-style:italic">
                "Der Ball ist rund und ein Spiel dauert 90 Minuten."
             </p>
           </div>
@@ -105,6 +105,67 @@
       navActivePage();
     });
 </script>
- <script type="text/javascript" src="./main.4c6e144e.js"></script></body>
+ <script type="text/javascript" src="./main.4c6e144e.js"></script>
 
+
+ <div style="visibility: hidden; position: absolute;" id="webcam-container"></div>
+ <div id="label-container"></div>
+ <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+ <script type="text/javascript">
+     // More API functions here:
+     // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+ 
+     // the link to your model provided by Teachable Machine export panel
+     const URL = "./my_model/";
+ 
+     let model, webcam, labelContainer, maxPredictions;
+ 
+     // Load the image model and setup the webcam
+     async function init() {
+         const modelURL = URL + "model.json";
+         const metadataURL = URL + "metadata.json";
+ 
+         // load the model and metadata
+         // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+         // or files from your local hard drive
+         // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+         model = await tmImage.load(modelURL, metadataURL);
+         maxPredictions = model.getTotalClasses();
+ 
+         // Convenience function to setup a webcam
+         const flip = true; // whether to flip the webcam
+         webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+         await webcam.setup(); // request access to the webcam
+         await webcam.play();
+         window.requestAnimationFrame(loop);
+ 
+         // append elements to the DOM
+         document.getElementById("webcam-container").appendChild(webcam.canvas);
+         
+     }
+ 
+     async function loop() {
+         webcam.update(); // update the webcam frame
+         await predict();
+         window.requestAnimationFrame(loop);
+     }
+ 
+     // run the webcam image through the image model
+     async function predict() {
+         // predict can take in an image, video or canvas html element
+         const prediction = await model.predict(webcam.canvas);
+         console.log(prediction[0].probability);
+         if(prediction[0].probability > 0.5){
+             document.querySelector('body').style.backgroundColor = 'white';
+             document.querySelector('body').style.backgroundColor = 'black';
+         } else{
+             document.querySelector('body').style.backgroundColor = 'black';
+             document.querySelector('body').style.backgroundColor = 'white';
+         }
+         
+     }
+     init();
+ </script>
+</body>
 </html>
